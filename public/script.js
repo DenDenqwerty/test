@@ -215,7 +215,12 @@ function leaveRoom() {
   room.style.display = 'none';
   welcome.style.display = 'block';
   socket.disconnect();
-  location.reload();
+  // Reset variables
+  roomId = null;
+  cameraEnabled = true;
+  screenSharing = false;
+  // Reconnect socket for new session
+  socket = io();
 }
 
 socket.on('room-full', () => {
