@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Видеоконференция</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="welcome">
+    <h1>🎥 Видеоконференция</h1>
+    <button id="create-room">➕ Создать комнату</button>
+    <div id="room-info" style="display: none;">
+      <p>🔗 ID комнаты: <span id="room-id-display"></span></p>
+      <p>📤 Поделитесь этим ID с другими для присоединения.</p>
+    </div>
+    <div id="join-room">
+      <input type="text" id="room-id" placeholder="🔍 ID комнаты">
+      <button id="join-btn">🚪 Присоединиться</button>
+    </div>
+  </div>
+
+  <div id="room" style="display: none;">
+    <div id="room-info-room">
+      <p>🏠 Комната: <span id="room-id-room"></span></p>
+      <p id="status">🔄 Подключение...</p>
+    </div>
+    <div id="video-grid"></div>
+    <div id="controls">
+      <button id="toggle-camera">📹 Выключить камеру</button>
+      <button id="share-screen">🖥️ Демонстрация экрана</button>
+      <button id="leave-room">🚪 Выйти</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
