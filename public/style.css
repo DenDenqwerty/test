@@ -117,6 +117,10 @@ input:focus {
   margin-bottom: 30px;
 }
 
+.video-container {
+  position: relative;
+}
+
 video {
   width: 100%;
   height: auto;
@@ -127,6 +131,29 @@ video {
 
 video:hover {
   transform: scale(1.02);
+}
+
+.speaking-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: none;
+}
+
+.speaking-indicator.speaking {
+  background-color: #ff4444;
+  box-shadow: 0 0 10px #ff4444;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 #controls {

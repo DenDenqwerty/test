@@ -15,6 +15,7 @@ let roomId;
 let userId = Math.random().toString(36).substr(2, 9);
 let peers = {};
 let cameraEnabled = true;
+let micEnabled = true;
 let screenSharing = false;
 
 createRoomBtn.addEventListener('click', () => {
@@ -32,6 +33,8 @@ joinBtn.addEventListener('click', () => {
 });
 
 toggleCameraBtn.addEventListener('click', toggleCamera);
+const toggleMicBtn = document.getElementById('toggle-mic');
+toggleMicBtn.addEventListener('click', toggleMic);
 shareScreenBtn.addEventListener('click', shareScreen);
 leaveRoomBtn.addEventListener('click', leaveRoom);
 
@@ -169,18 +172,59 @@ function handleSignal(data) {
 }
 
 function addVideoStream(id, stream, muted = false) {
+  const videoContainer = document.createElement('div');
+  videoContainer.className = 'video-container';
+  videoContainer.id = `container-${id}`;
+
   const video = document.createElement('video');
   video.id = id;
   video.srcObject = stream;
   video.autoplay = true;
   video.muted = muted;
-  videoGrid.appendChild(video);
+
+  const speakingIndicator = document.createElement('div');
+  speakingIndicator.className = 'speaking-indicator';
+  speakingIndicator.id = `speaking-${id}`;
+
+  videoContainer.appendChild(video);
+  videoContainer.appendChild(speakingIndicator);
+  videoGrid.appendChild(videoContainer);
+
+  if (!muted) {
+    monitorAudioLevel(stream, id);
+  }
+}
+
+function monitorAudioLevel(stream, id) {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioContext.createAnalyser();
+  const microphone = audioContext.createMediaStreamSource(stream);
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  analyser.fftSize = 256;
+  microphone.connect(analyser);
+
+  const checkAudioLevel = () => {
+    analyser.getByteFrequencyData(dataArray);
+    const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+    const indicator = document.getElementById(`speaking-${id}`);
+
+    if (average > 30) { // Threshold for speaking
+      indicator.classList.add('speaking');
+    } else {
+      indicator.classList.remove('speaking');
+    }
+
+    requestAnimationFrame(checkAudioLevel);
+  };
+
+  checkAudioLevel();
 }
 
 function removeVideoStream(id) {
-  const video = document.getElementById(id);
-  if (video) {
-    video.remove();
+  const container = document.getElementById(`container-${id}`);
+  if (container) {
+    container.remove();
   }
 }
 
@@ -188,6 +232,12 @@ function toggleCamera() {
   cameraEnabled = !cameraEnabled;
   localStream.getVideoTracks()[0].enabled = cameraEnabled;
   toggleCameraBtn.textContent = cameraEnabled ? '📹 Выключить камеру' : '📷 Включить камеру';
+}
+
+function toggleMic() {
+  micEnabled = !micEnabled;
+  localStream.getAudioTracks()[0].enabled = micEnabled;
+  toggleMicBtn.textContent = micEnabled ? '🎤 Выключить микрофон' : '🔇 Включить микрофон';
 }
 
 function shareScreen() {
@@ -237,6 +287,7 @@ function leaveRoom() {
   // Reset variables
   roomId = null;
   cameraEnabled = true;
+  micEnabled = true;
   screenSharing = false;
   // Reconnect socket for new session
   socket = io();
