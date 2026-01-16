@@ -44,6 +44,12 @@ function joinRoom(id) {
   initWebRTC();
 }
 
+socket.on('all-users', (users) => {
+  users.forEach(userId => {
+    connectToNewUser(userId, localStream);
+  });
+});
+
 function initWebRTC() {
   document.getElementById('status').textContent = '🔄 Подключение...';
   navigator.mediaDevices.getUserMedia({ video: true, audio: true })

@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
     rooms[roomId].push(userId);
     socket.join(roomId);
 
-    socket.to(roomId).emit('user-connected', userId);
+    socket.emit('all-users', rooms[roomId].filter(id => id !== userId));
 
     socket.on('disconnect', () => {
       rooms[roomId] = rooms[roomId].filter(id => id !== userId);
@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('signal', (data) => {
-    socket.to(data.roomId).emit('signal', data);
+    io.to(data.to).emit('signal', data);
   });
 });
 
