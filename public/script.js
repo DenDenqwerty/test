@@ -96,11 +96,13 @@ function addNotification(message) {
 }
 
 function connectToNewUser(newUserId, stream) {
+  console.log('Connecting to new user:', newUserId);
   const peerConnection = createPeerConnection(newUserId);
   stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
 
   peerConnection.createOffer()
     .then(offer => {
+      console.log('Created offer for', newUserId);
       return peerConnection.setLocalDescription(offer);
     })
     .then(() => {
