@@ -54,6 +54,7 @@ function initWebRTC() {
       socket.on('user-connected', (newUserId) => {
         connectToNewUser(newUserId, stream);
         document.getElementById('status').textContent = `👥 Участников: ${Object.keys(peers).length + 1}`;
+        addNotification(`👋 Пользователь ${newUserId.slice(0, 6)} присоединился`);
       });
       socket.on('user-disconnected', (disconnectedUserId) => {
         if (peers[disconnectedUserId]) {
@@ -62,6 +63,7 @@ function initWebRTC() {
           removeVideoStream(disconnectedUserId);
         }
         document.getElementById('status').textContent = `👥 Участников: ${Object.keys(peers).length + 1}`;
+        addNotification(`👋 Пользователь ${disconnectedUserId.slice(0, 6)} вышел`);
       });
       socket.on('signal', (data) => {
         handleSignal(data);
@@ -71,6 +73,17 @@ function initWebRTC() {
       console.error('Error accessing media devices:', err);
       document.getElementById('status').textContent = '❌ Ошибка доступа к камере';
     });
+}
+
+function addNotification(message) {
+  const notifications = document.getElementById('notifications');
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = message;
+  notifications.appendChild(notification);
+  setTimeout(() => {
+    notification.remove();
+  }, 5000); // Remove after 5 seconds
 }
 
 function connectToNewUser(newUserId, stream) {
