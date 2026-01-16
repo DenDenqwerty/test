@@ -1,4 +1,4 @@
-const socket = io();
+let socket = io();
 const videoGrid = document.getElementById('video-grid');
 const welcome = document.getElementById('welcome');
 const room = document.getElementById('room');
@@ -120,9 +120,9 @@ function createPeerConnection(peerId) {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
       {
-        urls: 'turn:turn.bistri.com:80',
-        username: 'homeo',
-        credential: 'homeo'
+        urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
+        username: 'webrtc',
+        credential: 'webrtc'
       }
     ]
   });
@@ -139,9 +139,18 @@ function createPeerConnection(peerId) {
   };
 
   pc.ontrack = (event) => {
+    console.log('Received track from', peerId);
     if (!document.getElementById(peerId)) {
       addVideoStream(peerId, event.streams[0]);
     }
+  };
+
+  pc.onconnectionstatechange = () => {
+    console.log('Connection state for', peerId, ':', pc.connectionState);
+  };
+
+  pc.oniceconnectionstatechange = () => {
+    console.log('ICE connection state for', peerId, ':', pc.iceConnectionState);
   };
 
   peers[peerId] = pc;
